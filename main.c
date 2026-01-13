@@ -1,38 +1,6 @@
-# Gelbooru Downloader
-Script for search tags and download images from Gelbooru \
-Скрипт для поиска тегов и загрузки изображений с Gelbooru \
-
-- Search tags
-- Download images
-
-Based on Gelbooru Downloader Lib
-
-## Usage
-<img src="assets/search-tags.png">
-<img src="assets/download_images.png">
-
-
-## Dependencies
-### Libs
-- curl
-
-## Build
-### Linux
-```bash
-make
-```
-### Windows
-Not supports
-
-## Gelbooru Downloader Lib
-Single-Header Lib
-### Include
-```c
 #define GELBOORU_DOWNLOADER_IMPLEMENTATION
 #include "gelbooru_downloader.h"
-```
-### Tag Search example
-```c
+
 void search_tags(const char *query) {
     printf("Search tags: %s\n", query);
     gelbooru *gbooru = gelbooru_create();
@@ -64,26 +32,22 @@ void search_tags(const char *query) {
 
     gelbooru_destroy(gbooru);
 }
-```
 
-### Download example
-```c
+
+
 void download_images(int tags_count, char **input_tags) {
-    // create tags vector
     vector *tags = vector_create();
     if (tags == NULL) {
         printf("Failed to create tags vector\n");
         return;
     }
 
-    // create main gelbooru object
     gelbooru* gbooru = gelbooru_create();
     if (gbooru == NULL) {
         printf("Failed to create Gelbooru object\n");
         return;
     }
 
-    // copy tags
     for (int i = 0; i < tags_count; i++) {
         char *tag = strdup(input_tags[i]);
         if (tag == NULL) {
@@ -103,7 +67,7 @@ void download_images(int tags_count, char **input_tags) {
     printf("\n");
 
 
-    // add formats
+    // formats
     gelbooru_add_image_format(gbooru, "jpg");
     gelbooru_add_image_format(gbooru, "jpeg");
     gelbooru_add_image_format(gbooru, "png");
@@ -140,5 +104,29 @@ void download_images(int tags_count, char **input_tags) {
     vector_destroy(tags);
     gelbooru_destroy(gbooru);
 }
-```
 
+
+int main(int argc, char **argv) {
+    printf("\033[36mGelbooru Downloader by AliceZed\033[0m\n");
+
+    char msg[] = "Usage:\n"
+                "gbooru search-tags <query>\n"
+                "gbooru download <tag1> [<tag2> ...]\n";
+
+    if (argc < 3) {
+        printf(msg);
+        return 1;
+    }
+
+    if (strcmp(argv[1], "search-tags") == 0) {
+        search_tags(argv[2]);
+    }
+    else if (strcmp(argv[1], "download") == 0) {
+        download_images(argc - 2, argv + 2);
+    }
+    else {
+        printf(msg);
+        return 1;
+    }
+    return 0;
+}
